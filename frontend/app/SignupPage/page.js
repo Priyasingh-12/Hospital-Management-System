@@ -28,12 +28,38 @@ export default function SignupPage() {
     })
   }
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
+  const handleSubmit = async (e) => {
+  e.preventDefault();
 
-    console.log("Signup Data:", formData);
-  };
+  try {
+    const response = await fetch(
+      "http://localhost:5000/api/auth/signup",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData),
+      }
+    );
 
+    const data = await response.json();
+
+    console.log(data);
+
+    if (!response.ok) {
+      alert(data.message);
+      return;
+    }
+
+    alert("Signup successful!");
+    router.push("/LoginPage");
+
+  } catch (error) {
+    console.error("Signup error:", error);
+    alert("Something went wrong");
+  }
+};
 
   return (
     <main className="min-h-screen bg-[#f5f9fc] p-3 sm:p-5">

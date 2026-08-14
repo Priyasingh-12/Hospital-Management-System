@@ -20,11 +20,49 @@ const [showPassword, setShowPassword] = useState(false);
     })
   }
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
+const handleSubmit = async (e) => {
+  e.preventDefault();
 
-    console.log("Login Data:", formData);
-  };
+  try {
+    const response = await fetch(
+      "http://localhost:5000/api/auth/login",
+      {
+        method: "POST",
+
+        headers: {
+          "Content-Type": "application/json",
+        },
+
+        body: JSON.stringify(formData),
+      }
+    );
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      alert(data.message);
+      return;
+    }
+
+    // Save JWT
+    localStorage.setItem("token", data.token);
+
+    // Save user
+    localStorage.setItem(
+      "user",
+      JSON.stringify(data.user)
+    );
+
+    alert("Login successful!");
+
+    router.push("/dashboard");
+
+  } catch (error) {
+    console.error("Login error:", error);
+    alert("Unable to connect to server");
+  }
+};
+
 
   return (
     <main className="min-h-screen bg-[#f5f9fc] p-3 sm:p-5">
