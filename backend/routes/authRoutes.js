@@ -94,6 +94,7 @@ router.post("/login", async (req, res) => {
       {
         userId: user._id,
         email: user.email,
+         role: user.role,
       },
       process.env.JWT_SECRET,
       {
@@ -108,11 +109,10 @@ router.post("/login", async (req, res) => {
         id: user._id,
         name: user.name,
         email: user.email,
+        role: user.role,
       },
     });
   } catch (error) {
-    console.log("LOGIN ERROR:", error);
-
     return res.status(500).json({
       message: "Login server error",
       error: error.message,
