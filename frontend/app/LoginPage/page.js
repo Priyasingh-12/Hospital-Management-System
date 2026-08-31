@@ -1,13 +1,34 @@
 "use client";
 
-import { useRouter } from "next/navigation";
 import { useState } from "react";
 import toast from "react-hot-toast";
-import { Mail, Lock, Eye, EyeOff } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { Mail, Lock, Eye, EyeOff, ArrowRight } from "lucide-react";
+
+// ============ EKG trace: one tile repeated to make a seamless scroll ============
+const EKG_TILE_WIDTH = 140;
+const EKG_TILE_POINTS = [
+  [0, 30], [24, 30], [33, 30], [40, 10], [47, 46], [54, 4], [61, 30], [140, 30],
+];
+function buildEkgPath(tiles) {
+  let d = "";
+  for (let i = 0; i < tiles; i++) {
+    const offset = i * EKG_TILE_WIDTH;
+    EKG_TILE_POINTS.forEach(([x, y], idx) => {
+      const cmd = i === 0 && idx === 0 ? "M" : "L";
+      d += `${cmd}${x + offset},${y} `;
+    });
+  }
+  return d.trim();
+}
+const EKG_TILES = 14;
+const EKG_PATH = buildEkgPath(EKG_TILES);
+const EKG_WIDTH = EKG_TILE_WIDTH * EKG_TILES;
 
 export default function LoginPage() {
   const router = useRouter();
 
+  const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
 
   const [formData, setFormData] = useState({
@@ -45,8 +66,10 @@ export default function LoginPage() {
     };
 
     // Email validation
-    if (!formData.email) {
+    if (!formData.email.trim()) {
       newErrors.email = "Email is required";
+    } else if (!formData.email.includes("@")) {
+      newErrors.email = "Enter a valid email";
     }
 
     // Password validation
@@ -60,6 +83,9 @@ export default function LoginPage() {
     if (newErrors.email || newErrors.password) {
       return;
     }
+
+    // Start loading
+    setLoading(true);
 
     try {
       const response = await fetch(
@@ -89,26 +115,21 @@ export default function LoginPage() {
       localStorage.setItem("token", data.token);
 
       // Save user
-      localStorage.setItem(
-        "user",
-        JSON.stringify(data.user)
-      );
+      localStorage.setItem("user", JSON.stringify(data.user));
 
       // Login successful
-  toast.success("Loin successful!");
+      toast.success("Login successful!");
 
       setTimeout(() => {
-
         // Go to dashboard
-        if(data.user.role === "admin") {
+        if (data.user.role === "admin") {
           router.push("/admin/dashboard");
-        }else if (data.user.role === "doctor") {
-         router.push("/doctor/dashboard");
-        }else if (data.user.role === "patient") {
-           router.push("/patient/dashboard");
+        } else if (data.user.role === "doctor") {
+          router.push("/doctor/dashboard");
+        } else if (data.user.role === "patient") {
+          router.push("/patient/dashboard");
         }
-         }, 1000);
-
+      }, 1000);
     } catch (error) {
       console.error("Login error:", error);
 
@@ -116,233 +137,223 @@ export default function LoginPage() {
         email: "Unable to connect to server",
         password: "",
       });
+    } finally {
+      // Stop loading
+      setLoading(false);
     }
   };
 
   return (
-    <main className="min-h-screen bg-[#f5f9fc] p-3 sm:p-5">
+    <>
+      <style>{`
+        @keyframes ekg-scroll {
+          from { transform: translateX(0); }
+          to { transform: translateX(-${EKG_TILE_WIDTH}px); }
+        }
+      `}</style>
 
-      <div className="mx-auto flex min-h-[calc(100vh-24px)] max-w-[1400px] overflow-hidden rounded-[20px] bg-white shadow-[0_10px_40px_rgba(0,0,0,0.08)]">
+      <main className=" min-h-screen p-5 bg-[#F4F6F2]">
+        <div className=" mx-auto flex min-h-[calc(100vh-40px)] max-w-6xl overflow-hidden rounded-[22px] bg-white shadow-2xl">
+          {/* ================= left side =============== */}
 
-        {/* ================= LEFT SIDE ================= */}
-
-        <section className="relative hidden w-1/2 overflow-hidden lg:block">
-
-          <div
-            className="absolute inset-0 bg-cover bg-center"
-            style={{
-              backgroundImage: "url('/doctorphoto.avif')",
-            }}
-          />
-
-          {/* Blue overlay */}
-          <div className="absolute inset-0 bg-gradient-to-b from-[#d7edfb]/50 via-[#72add2]/55 to-[#267eae]/95" />
-
-          {/* Left content */}
-          <div className="relative z-10 flex h-full flex-col justify-end px-16 pb-16 text-green-950">
-
-            <h1 className="mb-8 text-3xl font-bold tracking-wide">
-              MEDICARE +
-            </h1>
-
-            <p className="max-w-md text-lg font-bold leading-7 text-green-950/95">
-              Empowering Healthcare, One Click at a Time:
-              <br />
-              Your Health, Your Records, Your Control.
-            </p>
-
-          </div>
-        </section>
-
-        {/* ================= RIGHT SIDE ================= */}
-
-        <section className="flex w-full items-center justify-center bg-white px-6 py-10 lg:w-1/2">
-
-          <div className="w-full max-w-[450px]">
-
-            {/* ================= LOGIN HEADING ================= */}
-
+          <section className=" relative  w-[45%]  bg-[#0E1F1B]  bg-[radial-gradient(circle_at_15%_8%,rgba(79,187,164,0.14),transparent_45%)]
+      flex flex-col justify-between p-[44px] pb-[40px] overflow-hidden text-[#EFF4F1] " >
             <div>
-              <h1 className="text-4xl font-bold text-gray-950">
-                Login
+              <h2 className="text-2xl font-medium">
+                Medicare<span className="text-[#63C7AF] m-1">+</span>
+              </h2>
+
+              <div className="mt-7  rounded-2xl border border-white/10 bg-white/5 p-5">
+                <div className="flex items-center justify-between">
+                  <p className="text-sm text-gray-300">
+                    Vitals monitor
+                  </p>
+
+                  {/* live indicator: Tailwind's built-in pulse animation */}
+                  <span className="flex items-center gap-1.5 text-[10px] tracking-wide text-[#63C7AF]">
+                    <span className="h-1.5 w-1.5 rounded-full bg-[#63C7AF] animate-pulse motion-reduce:animate-none" />
+                    Live
+                  </span>
+                </div>
+
+                <div className="mt-5 grid grid-cols-3 gap-4">
+                  <div>
+                    <p className="text-2xl">72</p>
+                    <p className="text-xs text-gray-400">
+                      Heart rate
+                    </p>
+                  </div>
+
+                  <div>
+                    <p className="text-2xl">98%</p>
+                    <p className="text-xs text-gray-400">
+                      SpO2
+                    </p>
+                  </div>
+
+                  <div>
+                    <p className="text-2xl">118/76</p>
+                    <p className="text-xs text-gray-400">
+                      Blood pressure
+                    </p>
+                  </div>
+
+                </div>
+                {/* =================== EKG scroll animation ----------------- */}
+                <div className="mt-5 h-11 overflow-hidden border-t border-white/10 pt-2.5 [mask-image:linear-gradient(90deg,transparent,black_8%,black_92%,transparent)] [-webkit-mask-image:linear-gradient(90deg,transparent,black_8%,black_92%,transparent)]">
+                  <svg
+                    className="animate-[ekg-scroll_5s_linear_infinite] motion-reduce:animate-none"
+                    width={EKG_WIDTH}
+                    height="34"
+                    viewBox={`0 0 ${EKG_WIDTH} 34`}
+                  >
+                    <path
+                      d={EKG_PATH}
+                      fill="none"
+                      stroke="#4FBBA4"
+                      strokeWidth="1.75"
+                      strokeLinejoin="round"
+                      strokeLinecap="round"
+                    />
+                  </svg>
+                </div>
+
+              </div>
+              <p className="mt-10 text-md uppercase tracking-widest text-[#63C7AF]">
+                Hospital Management system
+              </p>
+              <h1 className="mt-3 max-w-md text-2xl font-medium leading-tight">
+                One chart, every visit, every provider — always in sync.
               </h1>
 
-              <p className="mt-2 text-green-950">
-                Log in to your account.
+              <p className="mt-4 max-w-md text-sm leading-6 text-green-100">
+                Log in to pick up right where you left off — visits,
+                schedules, and records, all in one place.
+              </p>
+
+            </div>
+          </section>
+
+          {/* ====================== right side ============ */}
+          <section className="flex flex-1 items-center justify-center px-8 py-10">
+            <div className="w-full max-w-md">
+              <span className=" mb-6 block text-[10.5px] tracking-[0.08em] uppercase text-[#6C7B75]"  >
+                Welcome back
+              </span>
+
+              <h1 className="text-3xl font-medium text-[#0E1F1B]">
+                Log in to your account
+              </h1>
+              <p className="mt-2 text-sm text-gray-500">
+                Enter your details to pick up where you left off.
+              </p>
+
+              {/* ====================== form ============== */}
+
+              <form className="mt-6" onSubmit={handleSubmit}>
+                {/* ============== email ============ */}
+                <div className="mb-4">
+                  <label htmlFor="email" className="mb-2 block text-xs font-medium uppercase tracking-wider text-gray-500"> Email</label>
+                  <div className="relative">
+                    <Mail size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+                    <input type="email"
+                      id="email"
+                      name="email"
+                      value={formData.email}
+                      onChange={handleChange}
+                      placeholder="name@clinic.com"
+                      className="h-12 w-full rounded-xl border border-gray-200 bg-[#E5EBE1] 
+                         pl-11 pr-4 text-sm outline-none transition-all duration-150 focus:border-[#146B5D] focus:bg-white focus:ring-2 focus:ring-[#146B5D]/15" />
+                  </div>
+                  {errors.email && (
+                    <p className="mt-2 text-sm text-red-500">
+                      {errors.email}
+                    </p>
+                  )}
+                </div>
+                {/* =================== password ============= */}
+                <div className="mb-2">
+                  <label htmlFor="password"
+                    className="mb-2 block text-xs font-medium uppercase tracking-wide text-gray-900">Password</label>
+                  <div className="relative">
+                    <Lock size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+
+                    <input type={showPassword ? "text" : "password"}
+                      id="password"
+                      name="password"
+                      value={formData.password}
+                      onChange={handleChange}
+                      placeholder="Enter password"
+                      className="h-12 w-full rounded-xl border border-gray-200 bg-[#E5EBE1] 
+                         pl-11 pr-4 text-sm outline-none transition-all duration-150 focus:border-[#146B5D] focus:bg-white focus:ring-2 focus:ring-[#146B5D]/15" />
+
+                    <button type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="absolute right-4 top-1/2 -translate-y-1/2 text-green-800 transition-colors duration-150 hover:text-green-950" >
+                      {showPassword ? (
+                        <EyeOff size={19} />
+                      ) : (
+                        <Eye size={19} />
+                      )}
+                    </button>
+                  </div>
+                  {errors.password && (
+                    <p className="mt-2 text-sm text-red-500">
+                      {errors.password}
+                    </p>
+                  )}
+
+                </div>
+
+                {/* ================= FORGOT PASSWORD ================= */}
+                <div className="mb-4 flex justify-end">
+                  <button
+                    type="button"
+                    className="text-xs font-medium text-[#146B5D] transition-colors duration-150 hover:text-[#0B4941]"
+                  >
+                    Forgot password?
+                  </button>
+                </div>
+
+                {/* =========== button ============ */}
+                <button type="submit"
+                  disabled={loading}
+                  className="group flex h-12 w-full items-center justify-center gap-2 rounded-full bg-[#146B5D] font-semibold text-white transition-colors duration-150 hover:bg-[#0B4941] disabled:opacity-60 disabled:cursor-not-allowed">
+                  {loading ? "Logging in..." : (
+                    <>
+                      Log in
+                      <ArrowRight size={16} className="transition-transform duration-150 group-hover:translate-x-1" />
+                    </>
+                  )}
+                </button>
+              </form>
+
+              {/* ================= GOOGLE LOGIN ================= */}
+              <button
+                type="button"
+                className="mt-3 flex h-12 w-full items-center justify-center gap-3 rounded-full border border-gray-200 bg-white text-sm font-medium text-gray-500 transition-colors duration-150 hover:bg-[#E5EBE1]/60"
+              >
+                <span className="text-lg font-bold text-[#4285F4]">
+                  G
+                </span>
+                <span>
+                  Log in with Google
+                </span>
+              </button>
+
+              <p className="mt-6 text-center text-sm text-gray-500">
+                Don&apos;t have an account?
+                <button type="button"
+                  onClick={() => router.push("/SignupPage")}
+                  className="ml-1 font-semibold text-[#0E1F1B] transition-colors duration-150 hover:text-[#146B5D]">
+                  Sign up
+                </button>
               </p>
             </div>
 
-            {/* ================= LOGIN FORM ================= */}
-
-            <form
-              className="mt-8"
-              onSubmit={handleSubmit}
-            >
-
-              {/* ================= EMAIL ================= */}
-
-              <div className="mb-5">
-
-                <label
-                  htmlFor="email"
-                  className="mb-2 block text-sm font-semibold text-green-950"
-                >
-                  Email
-                </label>
-
-                <div className="relative">
-
-                  <Mail
-                    size={19}
-                    className="absolute left-4 top-1/2 -translate-y-1/2 text-green-950"
-                  />
-
-                  <input
-                    id="email"
-                    name="email"
-                    type="email"
-                    value={formData.email}
-                    onChange={handleChange}
-                    placeholder="Enter your email"
-                    className={`h-[54px] w-full rounded-lg border bg-white pl-12 pr-4 text-sm text-gray-800 outline-none transition placeholder:text-gray-400 focus:ring-2 ${
-                      errors.email
-                        ? "border-red-400 focus:border-red-400 focus:ring-red-400/10"
-                        : "border-gray-200 focus:border-[#4b91bb] focus:ring-[#4b91bb]/10"
-                    }`}
-                  />
-
-                </div>
-
-                {/* Email error */}
-                {errors.email && (
-                  <p className="mt-2 text-sm text-red-500">
-                    {errors.email}
-                  </p>
-                )}
-
-              </div>
-
-              {/* ================= PASSWORD ================= */}
-
-              <div className="mb-3">
-
-                <label
-                  htmlFor="password"
-                  className="mb-2 block text-sm font-semibold text-gray-800"
-                >
-                  Password
-                </label>
-
-                <div className="relative">
-
-                  <Lock
-                    size={19}
-                    className="absolute left-4 top-1/2 -translate-y-1/2 text-green-950"
-                  />
-
-                  <input
-                    id="password"
-                    name="password"
-                    value={formData.password}
-                    onChange={handleChange}
-                    type={showPassword ? "text" : "password"}
-                    placeholder="Enter your password"
-                    className={`h-[54px] w-full rounded-lg border bg-white pl-12 pr-12 text-sm text-green-950 outline-none transition placeholder:text-gray-400 focus:ring-2 ${
-                      errors.password
-                        ? "border-red-400 focus:border-red-400 focus:ring-red-400/10"
-                        : "border-gray-200 focus:border-[#4b91bb] focus:ring-[#4b91bb]/10"
-                    }`}
-                  />
-
-                  {/* Show / Hide password */}
-
-                  <button
-                    type="button"
-                    onClick={() =>
-                      setShowPassword(!showPassword)
-                    }
-                    className="absolute right-4 top-1/2 -translate-y-1/2 text-green-800 hover:text-green-950"
-                  >
-                    {showPassword ? (
-                      <EyeOff size={19} />
-                    ) : (
-                      <Eye size={19} />
-                    )}
-                  </button>
-
-                </div>
-
-                {/* Password error */}
-
-                {errors.password && (
-                  <p className="mt-2 text-sm text-red-500">
-                    {errors.password}
-                  </p>
-                )}
-
-              </div>
-
-              {/* ================= FORGOT PASSWORD ================= */}
-
-              <div className="mb-7 flex justify-end">
-
-                <button
-                  type="button"
-                  className="text-sm font-medium text-green-950 transition hover:text-[#286783]"
-                >
-                  Forgot Password?
-                </button>
-
-              </div>
-
-              {/* ================= LOGIN BUTTON ================= */}
-
-              <button
-                type="submit"
-                className="h-[52px] w-full rounded-full bg-[#4b91bb] text-sm font-semibold text-green-950 shadow-sm transition duration-200 hover:bg-[#3d82aa] hover:shadow-md active:scale-[0.99]"
-              >
-                Log In
-              </button>
-
-            </form>
-
-            {/* ================= GOOGLE LOGIN ================= */}
-
-            <button
-              type="button"
-              className="mt-3 flex h-[52px] w-full items-center justify-center gap-3 rounded-full border border-gray-300 bg-white text-sm font-medium text-gray-500 transition hover:bg-gray-50"
-            >
-              <span className="text-lg font-bold text-[#4285F4]">
-                G
-              </span>
-
-              <span>
-                Log in with Google
-              </span>
-            </button>
-
-            {/* ================= SIGNUP ================= */}
-
-            <p className="mt-8 text-center text-sm text-gray-400">
-
-              Do not have an account?{" "}
-
-              <button
-                type="button"
-                onClick={() => router.push("/signup")}
-                className="font-medium text-green-950 hover:text-blue-500 hover:underline"
-              >
-                Sign Up
-              </button>
-
-            </p>
-
-          </div>
-
-        </section>
-
-      </div>
-
-    </main>
+          </section>
+        </div>
+      </main>
+    </>
   );
 }

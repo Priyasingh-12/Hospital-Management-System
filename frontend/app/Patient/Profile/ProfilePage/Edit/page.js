@@ -75,7 +75,7 @@ export default function EditProfilePage() {
       {/* ---------------- MAIN AREA ---------------- */}
       <div className="flex-1 flex flex-col overflow-y-auto">
         {/* Top header bar */}
-        <header className="flex items-center justify-between bg-white px-6 py-4 shadow-sm">
+        <header className="flex items-center justify-between bg-blue-200 px-6 py-4 shadow-sm">
           <button className="p-2 rounded-md bg-teal-500 text-white">
             <Menu size={18} />
           </button>
