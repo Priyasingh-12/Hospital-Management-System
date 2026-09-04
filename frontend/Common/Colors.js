@@ -1,0 +1,38 @@
+export const COLORS = {
+    bg: "#F6F7F3",
+    ink: "#1D2B28",
+    inkMuted: "#5B6864",
+    sidebar: "#17302C",
+    sidebarLine: "#28423D",
+    teal: "#2F5D57",
+    tealDeep: "#1F433C",
+    amber: "#B98530",
+    amberTint: "#F4E7D2",
+    line: "#E4E1D8",
+    card: "#FFFFFF",
+
+    bg1: "#F6F5F1",
+    navy: "#22334A",
+    navyDeep: "#141F2C",
+    gold: "#A9793E",
+    goldSoft: "#C79A5C",
+    goldTint: "#F3E8D6",
+    goldTintInk: "#7A5321",
+    inkFaint: "#8B94A0",
+    ink1: "#1B2430",
+    inkMuted1: "#616B76",
+
+    bg2: "#F4F5F7",
+    ink2: "#151A21",
+    inkMuted2: "#5B6472",
+    inkFaint2: "#8C94A0",
+    graphite: "#4A1220",
+    graphiteDeep: "#2E0B14",
+    signal: "#C9962F",
+    signalTint: "#FBF1DD",
+    signalTintInk: "#8A6414",
+    line2: "#E5E7EE",
+    overlay: "rgba(19, 22, 27, 0.55)",
+    
+};
+

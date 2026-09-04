@@ -1,14 +1,15 @@
 
 import React from 'react'
 import { Heart, LayoutGrid, User, Calendar } from "lucide-react";
+
 import { COLORS } from "../../../Common/Colors";
 
-export default function Sidebar({ patient}) {
+export default function Sidebar({ doctor }) {
     return (
         <div className='flex h-screen bg-gray-50'>
             <aside
                 className="flex flex-col py-8 px-5 font-body md:flex w-64 shrink-0 hidden"
-                style={{ background: COLORS.sidebar, color: "#EAF0EE" }}
+                          style={{ background: COLORS.navyDeep,color: "#EAF0EE"}}
             >
                 <div className="flex items-center gap-2 mb-12 px-1 font-bold text-2xl">
                     <Heart className="fill-red-900" />
@@ -17,15 +18,14 @@ export default function Sidebar({ patient}) {
                     </span>
                 </div>
 
-                <div className="flex items-center gap-3 mb-10 px-1">
+                <div className="flex  flex-col items-center gap-3 mb-10 px-1">
                     <img
                         src="/GIRL.png"
-                        alt={patient.name}
-                        className="w-20 h-20 rounded-full border-4 border-gray-700 mb-3"
-                    />
+                        alt={doctor?.name || "Doctor"}
+                        className="w-20 h-20 rounded-full border-4 border-gray-700 mb-3"    />
                     <div className="min-w-0">
-                        <p className="text-sm font-medium truncate text-white">{patient.name}</p>
-                        <p className="text-xs text-gray-400 tracking-wide mb-10 text-[#8FA39D]">{patient.role}</p>
+                        <p className="text-sm font-medium truncate text-white"  style={{ background: COLORS.gold, color: COLORS.navyDeep }}>{doctor.name}</p>
+                        <p className="text-xs text-gray-400 tracking-wide mb-10 text-[#8FA39D]">{doctor.role}</p>
                     </div>
                 </div>
 
@@ -39,7 +39,8 @@ export default function Sidebar({ patient}) {
     )
 }
 
-// ======================================== sidebar link =====================================
+
+// // ======================================== sidebar link =====================================
 function SidebarLink({ icon, label }) {
     return (
         <button

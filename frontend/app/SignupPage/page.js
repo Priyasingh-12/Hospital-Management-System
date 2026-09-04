@@ -1,6 +1,6 @@
 "use client";
 import { useState } from "react";
-import toast from "react-hot-toast";
+import toast, { Toaster } from "react-hot-toast";
 import { useRouter } from "next/navigation";
 import {
   Mail,
@@ -234,6 +234,12 @@ export default function SignupPage() {
 
   return (
     <>
+        <Toaster
+      position="top-right"
+      toastOptions={{
+        duration: 3000,
+      }}
+    />
       <style>{`
         @keyframes ekg-scroll {
           from { transform: translateX(0); }
