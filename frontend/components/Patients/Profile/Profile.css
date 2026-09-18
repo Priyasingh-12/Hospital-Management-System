@@ -54,3 +54,13 @@ a:focus-visible {
     animation: none;
   }
 }
+.no-select-card,
+.no-select-card * {
+    cursor: default;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    user-select: none;
+}
+
+
+

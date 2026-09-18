@@ -217,8 +217,7 @@ export default function AdminProfilePage() {
                         {/* ---- permissions ---- */}
                         <div
                             className="rounded-2xl px-6 py-6 mb-6"
-                            style={{ background: COLORS.card, border: `1px solid ${COLORS.line2}` }}
-                        >
+                            style={{ background: COLORS.card, border: `1px solid ${COLORS.line2}` }}  >
                             <h2 className="text-base font-semibold mb-4" style={{ color: COLORS.ink2 }}>
                                 Permissions
                             </h2>

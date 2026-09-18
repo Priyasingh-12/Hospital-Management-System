@@ -2,20 +2,7 @@
 import { useState } from "react";
 import { Plus, Filter, ArrowUpDown, LayoutGrid, Table2, ChevronsLeft, ChevronLeft, ChevronRight, ChevronsRight } from "lucide-react";
 
-import Header from "@/components/Patients/Header/Header";
-import Sidebar from "@/components/Patients/Sidebar/Sidebar";
-
 const tabs = ["Today", "Upcoming", "Past"];
-
-const patient = {
-  name: "Priya Singh",
-  role: "PATIENT",
-  bloodGroup: "O+",
-  country: "India",
-  visits: "120+",
-  medications: "80+",
-  avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=Marshal",
-};
 
 export default function AppointmentPage() {
 
@@ -24,12 +11,6 @@ export default function AppointmentPage() {
   const [pageSize, setPageSize] = useState(10);
 
   return (
-    <div className="flex bg-gray-50 h-screen"  >
-      {/* ========== sidebar ======== */}
-      <Sidebar />
-      {/* ============== main area ========= */}
-      <div className="flex-1 flex flex-col overflow-y-auto">
-        <Header />
 
         <main className="p-6 space-y-4">
           {/* ==============  top row ============ */}
@@ -124,12 +105,5 @@ export default function AppointmentPage() {
 
         </main>
 
-
-
-      </div>
-
-
-
-    </div>
   )
 }

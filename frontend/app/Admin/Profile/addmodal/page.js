@@ -1,6 +1,6 @@
 "use client";
 import React, { useState } from "react";
-import { COLORS } from "../../../../../Common/Colors";
+import { COLORS } from "../../../../Common/Colors";
 import {
     ShieldCheck,
     User,

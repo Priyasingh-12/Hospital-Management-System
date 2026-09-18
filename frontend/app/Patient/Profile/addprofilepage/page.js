@@ -1,6 +1,6 @@
 "use client";
 import React, { useState } from "react";
-import "../../../../../components/Patients/Profile/Profile.css";
+import "../../../../components/Patients/Profile/Profile.css";
 
 import {
     Heart,

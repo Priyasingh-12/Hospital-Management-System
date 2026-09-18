@@ -1,9 +1,6 @@
 "use client";
 import React, { useState, useRef, useEffect } from "react";
 import "../../../../components/Patients/Profile/Profile.css";
-import Sidebar from "../../../../components/Patients/Sidebar/Sidebar";
-
-import Header from "../../../../Common/Header";
 import { COLORS } from "../../../../Common/Colors";
 
 import {
@@ -15,7 +12,6 @@ import {
     Droplet,
     AlertTriangle,
     ShieldCheck,
-    ChevronRight,
     Check,
     X,
     Download,
@@ -47,6 +43,7 @@ const FIELD_ROWS = [
     { key: "allergies", label: "Allergies", icon: AlertTriangle, flag: true },
     { key: "emergency", label: "Emergency contact", icon: Phone },
 ];
+
 
 
 export default function ProfilPage() {
@@ -97,15 +94,7 @@ export default function ProfilPage() {
     }
 
     return (
-        <div className="flex h-screen  w-full overflow-hidden" style={{ background: COLORS.bg, color: COLORS.ink }}>
-
-            {/* =====================  sidebar  ================= */}
-             <Sidebar patient={patient} />
-            {/* ========================== main  area ============================= */}
-            <div className="flex-1 flex flex-col overflow-y-auto">
-                 <Header patient={patient} />
-                {/* ================================== profile content =================== */}
-                <main className="p-6 md:p-10">
+          <main className="p-6 md:p-10">
                     <div className="mx-auto max-w-3xl">
 
                         <div className="flex items-start justify-between gap-4 mb-1">
@@ -116,8 +105,7 @@ export default function ProfilPage() {
                                 <span
                                     className="flex items-center gap-1.5 text-xs font-medium px-3 py-1.5 rounded-full mt-1"
                                     style={{ background: "#E4EFE9", color: COLORS.tealDeep }}
-                                    role="status"
-                                >
+                                    role="status" >
                                     <Check size={13} />
                                     Saved
                                 </span>
@@ -138,7 +126,7 @@ export default function ProfilPage() {
                         {/* =================== id card ============== */}
                         <div
                             className="card-enter relative rounded-2xl overflow-hidden mb-10"
-                            style={{ background: `linear-gradient(155deg, ${COLORS.teal}, ${COLORS.tealDeep})` }}
+                             style={{ background: `linear-gradient(155deg, ${COLORS.navy}, ${COLORS.navyDeep})` }}
                         >
                             {/* =====water mark of heart */}
                             <Heart
@@ -327,11 +315,6 @@ export default function ProfilPage() {
 
                     </div>
                 </main>
-
-
-
-            </div>
-        </div>
     )
 }
 
@@ -346,3 +329,6 @@ function Stat({ label, value }) {
         </div>
     );
 }
+
+
+

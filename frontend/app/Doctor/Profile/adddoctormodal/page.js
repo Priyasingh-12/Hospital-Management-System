@@ -1,7 +1,7 @@
 "use client";
 import React, { useState } from "react";
-import "../../../../../components/Doctors/Profile/Profile.css";
-import { COLORS } from "../../../../../Common/Colors";
+import "../../../../components/Doctors/Profile/Profile.css";
+import { COLORS } from "../../../../Common/Colors";
 import {
     Stethoscope,
     User,
